@@ -250,4 +250,7 @@ function initMap() {
             createMarker: () => null, show: false
         }).addTo(window.mapInstance);
     };
+
+    // Expose for App.js
+    window.initMap = initMap;
 }

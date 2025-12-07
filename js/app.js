@@ -1,11 +1,14 @@
-// Main App Logic
+// Main App Logic - now Cloud Powered ☁️
+import { db } from './firebase-config.js';
+import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-// Simple state management
+// State
 let localItinerary = [];
+let unsubscribe = null; // for Listener
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Init Data
-    loadData();
+    // 1. Init Data (Real-time listener)
+    initRealTimeData();
 
     // 2. Init Core
     initCountdown();
@@ -14,79 +17,94 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Render
     renderFamilyGrid();
     renderItinerary();
-    // renderBudget(); // REMOVED as per user request
-    renderMagicMoment(); // ADDED: Something more entertaining
+    renderMagicMoment();
     renderFormOptions();
 
     // 4. Events
     initInteractions();
 
-    // Global exposure for onClick handlers
+    // Global
     window.deleteActivity = deleteActivity;
 });
 
-function loadData() {
-    const saved = localStorage.getItem('vacation_extra_activities');
-    const deleted = getDeletedIds();
+function initRealTimeData() {
+    // 0. MIGRATION FROM LOCAL STORAGE (One time run)
+    const localSaved = localStorage.getItem('vacation_extra_activities');
+    if (localSaved) {
+        try {
+            const localExtras = JSON.parse(localSaved);
+            if (localExtras.length > 0) {
+                console.log("🚀 Migrating " + localExtras.length + " items to Cloud...");
+                localExtras.forEach(async (item) => {
+                    // Start fresh with IDs let Firestore generate or force one
+                    const { id, ...data } = item;
+                    // Ensure type is preserved
+                    if (!data.type) data.type = "user-added";
+                    data.createdAt = Date.now();
 
-    let extras = [];
-    if (saved) {
-        try { extras = JSON.parse(saved); } catch (e) { }
+                    await addDoc(collection(db, "vacation_activities"), data);
+                });
+                // Clear Local Storage so we don't duplicate
+                localStorage.removeItem('vacation_extra_activities');
+                alert("¡Tus datos antiguos se han subido a la Nube! ☁️");
+            }
+        } catch (e) {
+            console.error("Migration error", e);
+        }
     }
 
-    // Merge Core + Extras
-    let combined = [...APP_DATA.itinerary, ...extras];
+    // Listen to 'vacation_activities' collection
+    const activitiesRef = collection(db, 'vacation_activities');
 
-    // Assign IDs if missing (for core items)
-    combined = combined.map(item => {
-        if (!item.id) {
-            // Create a deterministic pseudo-ID for core items
-            item.id = 'core_' + item.date.replace(/\s/g, '') + '_' + item.title.slice(0, 5).replace(/\s/g, '');
+    unsubscribe = onSnapshot(activitiesRef, (snapshot) => {
+        const cloudExtras = [];
+        snapshot.forEach((doc) => {
+            console.log("Cloud item:", doc.data());
+            cloudExtras.push({ ...doc.data(), id: doc.id });
+        });
+
+        // Merge Core + Cloud Extras
+        let combined = [...APP_DATA.itinerary, ...cloudExtras];
+
+        // Assign IDs to Core Items
+        combined = combined.map(item => {
+            if (!item.id) {
+                item.id = 'core_' + item.date.replace(/\s/g, '') + '_' + item.title.slice(0, 5).replace(/\s/g, '');
+            }
+            return item;
+        });
+
+        localItinerary = combined;
+        // Sort by day
+        localItinerary.sort((a, b) => a.day - b.day);
+
+        // Re-render
+        renderItinerary();
+
+        // Refresh Map
+        if (window.mapInstance) {
+            window.mapInstance.remove();
+            window.initMap();
         }
-        return item;
     });
-
-    // Filter out deleted
-    localItinerary = combined.filter(item => !deleted.includes(item.id));
-
-    // Sort logic (Crude date sort)
-    localItinerary.sort((a, b) => a.day - b.day);
 }
 
-function getDeletedIds() {
-    const raw = localStorage.getItem('vacation_deleted_items');
-    return raw ? JSON.parse(raw) : [];
-}
+// Replaces 'deleteActivity'
+async function deleteActivity(id) {
+    if (!confirm("¿Borrar esta actividad para TODOS?")) return;
 
-function deleteActivity(id) {
-    if (!confirm("¿Estás seguro de que deseas borrar esta actividad?")) return;
-
-    // Add to deleted list
-    const deleted = getDeletedIds();
-    deleted.push(id);
-    localStorage.setItem('vacation_deleted_items', JSON.stringify(deleted));
-
-    // Also remove from "extras" if it's there
-    const savedRaw = localStorage.getItem('vacation_extra_activities');
-    if (savedRaw) {
-        let extras = JSON.parse(savedRaw);
-        const newExtras = extras.filter(i => i.id !== id);
-        if (newExtras.length !== extras.length) {
-            localStorage.setItem('vacation_extra_activities', JSON.stringify(newExtras));
-        }
+    if (id.startsWith('core_')) {
+        alert("Las actividades base del itinerario no se pueden borrar (aún).");
+        return;
     }
 
-    // Refresh
-    loadData();
-    renderItinerary();
-
-    // Refresh Map if needed 
-    if (window.mapInstance) {
-        window.mapInstance.remove(); // Kill instance
-        window.initMap(); // Re-boot map
+    try {
+        await deleteDoc(doc(db, "vacation_activities", id));
+        // No need to reload manually, onSnapshot will trigger!
+    } catch (e) {
+        console.error("Error deleting: ", e);
+        alert("Error al borrar. Revisa tu conexión.");
     }
-
-    alert("Actividad eliminada.");
 }
 
 function initInteractions() {
@@ -95,34 +113,25 @@ function initInteractions() {
     const cancelBtn = document.getElementById('cancel-act');
     const form = document.getElementById('activity-form');
 
-    if (addBtn) {
-        addBtn.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
-    }
-
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-    }
+    if (addBtn) addBtn.addEventListener('click', () => modal.style.display = 'flex');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => modal.style.display = 'none');
 
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = "Buscando ubicación... 🌍";
+            submitBtn.innerText = "Guardando en la Nube... ☁️";
             submitBtn.disabled = true;
 
+            // Gather Data
             const author = document.getElementById('act-author').value;
             const dayIdx = document.getElementById('act-day').value;
             const title = document.getElementById('act-title').value;
             const details = document.getElementById('act-details').value;
             const locationInput = document.getElementById('act-location').value;
 
-            // 1. SMART GEOCODING
+            // Geocoding
             let foundCoords = null;
             let foundLabel = locationInput;
 
@@ -130,57 +139,43 @@ function initInteractions() {
                 try {
                     const provider = new GeoSearch.OpenStreetMapProvider();
                     const results = await provider.search({ query: locationInput });
-
                     if (results && results.length > 0) {
-                        // Take the best match
                         const match = results[0];
-                        foundCoords = [match.y, match.x]; // Lat, Lon
-                        foundLabel = match.label.split(',')[0]; // Shorten name
-                        console.log(`📍 Encontrado: ${foundLabel} en [${foundCoords}]`);
+                        foundCoords = [match.y, match.x];
+                        foundLabel = match.label.split(',')[0];
                     }
-                } catch (err) {
-                    console.error("Geocoding failed:", err);
-                }
+                } catch (err) { console.error("Geocoding failed", err); }
             }
 
             const baseDay = APP_DATA.itinerary.find(i => i.day == dayIdx);
             const dateStr = baseDay ? baseDay.date : `Día ${dayIdx}`;
 
-            const newId = 'user_' + Date.now();
-
             const newActivity = {
-                id: newId,
                 day: parseInt(dayIdx),
                 date: dateStr,
                 title: title,
                 location: foundLabel || locationInput || title,
-                coordinates: foundCoords, // SAVE THE COORDS!
+                coordinates: foundCoords,
                 type: "user-added",
                 details: details,
                 isUserAdded: true,
-                author: author
+                author: author,
+                createdAt: Date.now()
             };
 
-            // Save persistence
-            const saved = localStorage.getItem('vacation_extra_activities');
-            let extras = saved ? JSON.parse(saved) : [];
-            extras.push(newActivity);
-            localStorage.setItem('vacation_extra_activities', JSON.stringify(extras));
+            // Save to Firestore
+            try {
+                await addDoc(collection(db, "vacation_activities"), newActivity);
+                // Success
+                modal.style.display = 'none';
+                form.reset();
+            } catch (e) {
+                console.error("Error adding doc: ", e);
+                alert("Error al guardar en la nube.");
+            }
 
-            // Reload & Render
-            loadData();
-            renderItinerary(); // This will auto-update because data is fresh
-
-            modal.style.display = 'none';
-            form.reset();
             submitBtn.innerText = originalText;
             submitBtn.disabled = false;
-
-            // Refresh Map Properly
-            if (window.mapInstance) {
-                window.mapInstance.remove();
-                window.initMap();
-            }
         });
     }
 }

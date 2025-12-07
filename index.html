@@ -213,14 +213,409 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <script src="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.umd.js"></script>
+    <!-- Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-    <script src="js/data.js"></script> <!-- Mock Data -->
-    <script src="js/map.js"></script>
-    <script src="js/app.js"></script>
-</body>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3175/3175199.png">
+    </head>
+
+    <body>
+        <div class="app-container">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar glass-panel">
+                <div class="logo">
+                    <span class="logo-icon">✨</span>
+                    <h2>Vacaciones 2026</h2>
+                </div>
+                <ul class="nav-links">
+                    <li class="active" data-tab="dashboard">
+                        <span class="icon">🏠</span> Dashboard
+                    </li>
+                    <li data-tab="itinerary">
+                        <span class="icon">📅</span> Itinerario
+                    </li>
+                    <li data-tab="map">
+                        <span class="icon">🗺️</span> Mapa
+                    </li>
+                    <li data-tab="family">
+                        <span class="icon">👨‍👩‍👧‍👦</span> Familia
+                    </li>
+                </ul>
+                <div class="user-profile">
+                    <div class="avatar">CG</div>
+                    <div class="user-info">
+                        <p class="name">C. Galleguillos</p>
+                        <p class="role">Organizador</p>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Header -->
+                <header class="top-bar">
+                    <h1 id="page-title" class="animate__animated animate__fadeInLeft">Bienvenido a la Magia</h1>
+                    <div class="status-indicators">
+                        <div class="status-item online">
+                            <span class="dot"></span> Online
+                        </div>
+                        <div class="status-item weather">
+                            <span class="icon">☀️</span> 28°C (Simulado)
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Views -->
+                <div id="dashboard-view" class="view active animate__animated animate__fadeIn">
+                    <!-- Hero Countdown -->
+                    <section class="hero-countdown glass-panel">
+                        <h3>Cuenta Regresiva</h3>
+                        <div class="countdown-timer" id="countdown">
+                            <div class="time-unit">
+                                <span class="number" id="days">000</span>
+                                <span class="label">Días</span>
+                            </div>
+                            <div class="separator">:</div>
+                            <div class="time-unit">
+                                <span class="number" id="hours">00</span>
+                                <span class="label">Hrs</span>
+                            </div>
+                            <div class="separator">:</div>
+                            <div class="time-unit">
+                                <span class="number" id="minutes">00</span>
+                                <span class="label">Min</span>
+                            </div>
+                        </div>
+                        <p class="destination-label">Rumbo a Orlando & Caribe</p>
+                    </section>
+
+                    <div class="dashboard-grid">
+                        <div class="card glass-panel" style="--delay: 0.1s">
+                            <h4>Próxima Actividad</h4>
+                            <p class="highlight-text">Planificación del Viaje</p>
+                            <p class="sub-text">Define tus sueños hoy.</p>
+                        </div>
+
+                        <div class="card glass-panel" style="--delay: 0.3s">
+                            <h4>Clima en Destino</h4>
+                            <p class="highlight-text">Florida: 24°C</p>
+                            <p class="sub-text">Perfecto para Magic Kingdom</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="itinerary-view" class="view" style="display: none;">
+                    <div class="glass-panel full-height relative-container">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                            <h3>Itinerario Maestro</h3>
+                            <button id="add-activity-btn" class="ios-btn">+ Agendar Actividad</button>
+                        </div>
+
+                        <!-- Activity Form Modal (Hidden by default) -->
+                        <div id="activity-modal" class="modal-overlay" style="display:none;">
+                            <div class="modal-content glass-panel">
+                                <h4>✨ Nueva Aventura</h4>
+                                <form id="activity-form">
+                                    <div class="form-group">
+                                        <label>¿Quién propone?</label>
+                                        <select id="act-author" required class="glass-input">
+                                            <option value="C. Galleguillos">C. Galleguillos</option>
+                                            <option value="I. Rojas">I. Rojas</option>
+                                            <option value="J. Galleguillos">J. Galleguillos</option>
+                                            <option value="M. Galleguillos">M. Galleguillos (10)</option>
+                                            <option value="I. Muñoz">I. Muñoz</option>
+                                            <option value="A. Arias">A. Arias</option>
+                                            <option value="J. Muñoz">J. Muñoz</option>
+                                            <option value="A. Muñoz">A. Muñoz (13)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Día / Fecha</label>
+                                        <select id="act-day" required class="glass-input">
+                                            <!-- JS populated -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Actividad</label>
+                                        <input type="text" id="act-title" placeholder="Ej: Cena en Be Our Guest"
+                                            required class="glass-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ubicación (Para el Mapa)</label>
+                                        <input type="text" id="act-location" placeholder="Ej: Magic Kingdom"
+                                            class="glass-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Detalles / Link de Reserva</label>
+                                        <textarea id="act-details"
+                                            placeholder="Link a la app de Disney, hora de reserva, etc."
+                                            class="glass-input"></textarea>
+                                    </div>
+                                    <div class="modal-actions">
+                                        <button type="button" id="cancel-act"
+                                            class="ios-btn secondary">Cancelar</button>
+                                        <button type="submit" class="ios-btn primary">Guardar en Consola</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="timeline" id="timeline-container">
+                            <!-- JS populated -->
+                            <p>Cargando itinerario...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="map-view" class="view" style="display: none;">
+                    <!-- Route Controls Overlay -->
+                    <div class="glass-panel"
+                        style="position: absolute; top: 20px; right: 20px; z-index: 1000; width: 300px; padding: 1.5rem;">
+                        <h4>🚗 Planificador de Rutas</h4>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Origen</label>
+                            <select id="route-start" class="glass-input" style="width:100%; padding:0.5rem;"></select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Destino</label>
+                            <select id="route-end" class="glass-input" style="width:100%; padding:0.5rem;"></select>
+                        </div>
+                        <button id="btn-calc-route" class="ios-btn primary" style="width:100%;">Calcular Ruta</button>
+                        <div id="route-results"
+                            style="margin-top:1rem; font-size:0.9rem; color:var(--accent-gold); display:none;">
+                            <p><strong>Distancia:</strong> <span id="dist-val">--</span></p>
+                            <p><strong>Tiempo:</strong> <span id="time-val">--</span></p>
+                        </div>
+                    </div>
+                    <div id="map" class="map-container"></div>
+                </div>
+
+                <div id="family-view" class="view" style="display: none;">
+                    <h3>Tripulación (8 Pasajeros)</h3>
+                    <div class="family-grid" id="family-grid">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Scripts -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+        <!-- Main Styles -->
+        <link rel="stylesheet" href="css/styles.css">
+
+        <!-- PWA Settings -->
+        <link rel="manifest" href="manifest.json">
+        <meta name="theme-color" content="#0f172a">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3175/3175199.png">
+        </head>
+
+        <body>
+            <div class="app-container">
+                <!-- Sidebar Navigation -->
+                <nav class="sidebar glass-panel">
+                    <div class="logo">
+                        <span class="logo-icon">✨</span>
+                        <h2>Vacaciones 2026</h2>
+                    </div>
+                    <ul class="nav-links">
+                        <li class="active" data-tab="dashboard">
+                            <span class="icon">🏠</span> Dashboard
+                        </li>
+                        <li data-tab="itinerary">
+                            <span class="icon">📅</span> Itinerario
+                        </li>
+                        <li data-tab="map">
+                            <span class="icon">🗺️</span> Mapa
+                        </li>
+                        <li data-tab="family">
+                            <span class="icon">👨‍👩‍👧‍👦</span> Familia
+                        </li>
+                    </ul>
+                    <div class="user-profile">
+                        <div class="avatar">CG</div>
+                        <div class="user-info">
+                            <p class="name">C. Galleguillos</p>
+                            <p class="role">Organizador</p>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Main Content Area -->
+                <main class="main-content">
+                    <!-- Header -->
+                    <header class="top-bar">
+                        <h1 id="page-title" class="animate__animated animate__fadeInLeft">Bienvenido a la Magia</h1>
+                        <div class="status-indicators">
+                            <div class="status-item online">
+                                <span class="dot"></span> Online
+                            </div>
+                            <div class="status-item weather">
+                                <span class="icon">☀️</span> 28°C (Simulado)
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Views -->
+                    <div id="dashboard-view" class="view active animate__animated animate__fadeIn">
+                        <!-- Hero Countdown -->
+                        <section class="hero-countdown glass-panel">
+                            <h3>Cuenta Regresiva</h3>
+                            <div class="countdown-timer" id="countdown">
+                                <div class="time-unit">
+                                    <span class="number" id="days">000</span>
+                                    <span class="label">Días</span>
+                                </div>
+                                <div class="separator">:</div>
+                                <div class="time-unit">
+                                    <span class="number" id="hours">00</span>
+                                    <span class="label">Hrs</span>
+                                </div>
+                                <div class="separator">:</div>
+                                <div class="time-unit">
+                                    <span class="number" id="minutes">00</span>
+                                    <span class="label">Min</span>
+                                </div>
+                            </div>
+                            <p class="destination-label">Rumbo a Orlando & Caribe</p>
+                        </section>
+
+                        <div class="dashboard-grid">
+                            <div class="card glass-panel" style="--delay: 0.1s">
+                                <h4>Próxima Actividad</h4>
+                                <p class="highlight-text">Planificación del Viaje</p>
+                                <p class="sub-text">Define tus sueños hoy.</p>
+                            </div>
+
+                            <div class="card glass-panel" style="--delay: 0.3s">
+                                <h4>Clima en Destino</h4>
+                                <p class="highlight-text">Florida: 24°C</p>
+                                <p class="sub-text">Perfecto para Magic Kingdom</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="itinerary-view" class="view" style="display: none;">
+                        <div class="glass-panel full-height relative-container">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                                <h3>Itinerario Maestro</h3>
+                                <button id="add-activity-btn" class="ios-btn">+ Agendar Actividad</button>
+                            </div>
+
+                            <!-- Activity Form Modal (Hidden by default) -->
+                            <div id="activity-modal" class="modal-overlay" style="display:none;">
+                                <div class="modal-content glass-panel">
+                                    <h4>✨ Nueva Aventura</h4>
+                                    <form id="activity-form">
+                                        <div class="form-group">
+                                            <label>¿Quién propone?</label>
+                                            <select id="act-author" required class="glass-input">
+                                                <option value="C. Galleguillos">C. Galleguillos</option>
+                                                <option value="I. Rojas">I. Rojas</option>
+                                                <option value="J. Galleguillos">J. Galleguillos</option>
+                                                <option value="M. Galleguillos">M. Galleguillos (10)</option>
+                                                <option value="I. Muñoz">I. Muñoz</option>
+                                                <option value="A. Arias">A. Arias</option>
+                                                <option value="J. Muñoz">J. Muñoz</option>
+                                                <option value="A. Muñoz">A. Muñoz (13)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Día / Fecha</label>
+                                            <select id="act-day" required class="glass-input">
+                                                <!-- JS populated -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Actividad</label>
+                                            <input type="text" id="act-title" placeholder="Ej: Cena en Be Our Guest"
+                                                required class="glass-input">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Ubicación (Para el Mapa)</label>
+                                            <input type="text" id="act-location" placeholder="Ej: Magic Kingdom"
+                                                class="glass-input">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Detalles / Link de Reserva</label>
+                                            <textarea id="act-details"
+                                                placeholder="Link a la app de Disney, hora de reserva, etc."
+                                                class="glass-input"></textarea>
+                                        </div>
+                                        <div class="modal-actions">
+                                            <button type="button" id="cancel-act"
+                                                class="ios-btn secondary">Cancelar</button>
+                                            <button type="submit" class="ios-btn primary">Guardar en Consola</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="timeline" id="timeline-container">
+                                <!-- JS populated -->
+                                <p>Cargando itinerario...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="map-view" class="view" style="display: none;">
+                        <!-- Route Controls Overlay -->
+                        <div class="glass-panel"
+                            style="position: absolute; top: 20px; right: 20px; z-index: 1000; width: 300px; padding: 1.5rem;">
+                            <h4>🚗 Planificador de Rutas</h4>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Origen</label>
+                                <select id="route-start" class="glass-input"
+                                    style="width:100%; padding:0.5rem;"></select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Destino</label>
+                                <select id="route-end" class="glass-input" style="width:100%; padding:0.5rem;"></select>
+                            </div>
+                            <button id="btn-calc-route" class="ios-btn primary" style="width:100%;">Calcular
+                                Ruta</button>
+                            <div id="route-results"
+                                style="margin-top:1rem; font-size:0.9rem; color:var(--accent-gold); display:none;">
+                                <p><strong>Distancia:</strong> <span id="dist-val">--</span></p>
+                                <p><strong>Tiempo:</strong> <span id="time-val">--</span></p>
+                            </div>
+                        </div>
+                        <div id="map" class="map-container"></div>
+                    </div>
+
+                    <div id="family-view" class="view" style="display: none;">
+                        <h3>Tripulación (8 Pasajeros)</h3>
+                        <div class="family-grid" id="family-grid">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Scripts -->
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+            <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+            <script src="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.umd.js"></script>
+
+            <script src="js/data.js"></script> <!-- Map Logic -->
+            <script type="module" src="js/map.js"></script>
+
+            <!-- App Logic (Module for Firebase) -->
+            <script type="module" src="js/app.js"></script>
+        </body>
 
 </html>
