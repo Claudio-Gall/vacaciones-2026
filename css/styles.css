@@ -1,0 +1,599 @@
+:root {
+    /* Premium Color Palette */
+    --bg-dark: #0f172a;
+    /* Slate 900 */
+    --bg-darker: #020617;
+    /* Slate 950 */
+    --accent-gold: #fbbf24;
+    /* Amber 400 */
+    --accent-gold-glow: rgba(251, 191, 36, 0.3);
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    /* Slate 800 with opacity */
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary: #3b82f6;
+    /* Blue 500 */
+
+    /* Spacing */
+    --sidebar-width: 260px;
+    --header-height: 80px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-darker);
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(251, 191, 36, 0.1) 0%, transparent 20%);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-right: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 3rem;
+    color: var(--accent-gold);
+}
+
+.logo-icon {
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+.logo h2 {
+    font-size: 1.25rem;
+    color: var(--text-main);
+}
+
+.nav-links {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.nav-links li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-muted);
+}
+
+.nav-links li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    transform: translateX(5px);
+}
+
+.nav-links li.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 100%);
+    color: var(--accent-gold);
+    border-left: 3px solid var(--accent-gold);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--bg-darker);
+    font-size: 0.9rem;
+}
+
+.user-info .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.user-info .role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.top-bar {
+    height: var(--header-height);
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-indicators {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+}
+
+.online .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+}
+
+/* Glass Panel Utility */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 24px;
+}
+
+/* Views & Anims */
+.view {
+    padding: 1rem 2rem 2rem;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Dashboard Specifics */
+.hero-countdown {
+    text-align: center;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+}
+
+.hero-countdown h3 {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.countdown-timer {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-unit .number {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.time-unit .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-top: 0.5rem;
+}
+
+.separator {
+    font-size: 3rem;
+    color: var(--glass-border);
+    transform: translateY(-1rem);
+}
+
+.destination-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--accent-gold);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-gold);
+}
+
+.card h4 {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.highlight-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.sub-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent-gold);
+    border-radius: 3px;
+    box-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+/* Map */
+.map-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.full-height {
+    height: 100%;
+    padding: 2rem;
+    /* Reduced padding to fit modal nicely */
+}
+
+/* --- NEW INTERACTIVE STYLES --- */
+
+/* Buttons */
+.ios-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--accent-gold);
+    color: var(--bg-darker);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.ios-btn:hover {
+    transform: scale(1.05);
+    background: #fbbf24;
+}
+
+.ios-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    box-shadow: none;
+}
+
+.ios-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    border: 1px solid var(--accent-gold);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.glass-input {
+    width: 100%;
+    padding: 0.8rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: inherit;
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.user-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Map specific overrides for SEARCH BAR CONTRAST */
+.leaflet-control-geosearch form {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leaflet-control-geosearch input.glass {
+    color: white !important;
+    /* Ensure text is white */
+    background: transparent;
+}
+
+/* General override if 'glass' class is not applied by library */
+.leaflet-control-geosearch input {
+    color: #fff !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Results container */
+.leaflet-control-geosearch .results {
+    background: rgba(30, 41, 59, 0.95);
+    color: white;
+}
+
+.leaflet-control-geosearch .results>* {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.leaflet-control-geosearch .results>.active,
+.leaflet-control-geosearch .results> :hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: transparent;
+}
+
+.leaflet-routing-container {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    color: white !important;
+    border-radius: 8px;
+}
+
+.leaflet-routing-alt {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.leaflet-routing-container h2,
+.leaflet-routing-container h3 {
+    color: var(--accent-gold);
+}
+
+/* --- MOBILE RESPONSIVE (Max Width 768px) --- */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    /* Convert Sidebar to Bottom Nav */
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        padding: 0.5rem;
+        background: rgba(15, 23, 42, 0.98);
+        /* Less transparent for readability */
+        border-right: none;
+        border-top: 1px solid var(--glass-border);
+        border-radius: 20px 20px 0 0;
+        z-index: 9999;
+        flex-direction: row;
+        justify-content: center;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Hide Desktop Elements */
+    .logo,
+    .user-profile,
+    .status-indicators {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        margin: 0;
+    }
+
+    .nav-links li {
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px;
+        margin: 0;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        text-align: center;
+    }
+
+    .nav-links li .icon {
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+    }
+
+    .nav-links li.active {
+        border-left: none;
+        background: rgba(251, 191, 36, 0.15);
+        transform: translateY(-5px);
+    }
+
+    /* Main Content Adjustments */
+    .main-content {
+        height: 100vh;
+        overflow-y: auto;
+        padding-bottom: 90px;
+        /* Space for Bottom Nav */
+    }
+
+    .top-bar {
+        padding: 1rem;
+        height: auto;
+    }
+
+    .top-bar h1 {
+        font-size: 1.5rem;
+    }
+
+    /* View Adjustments */
+    .view {
+        padding: 1rem 1rem 6rem 1rem;
+        /* Extra padding bottom */
+        gap: 1.5rem;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Countdown Scale */
+    .time-unit .number {
+        font-size: 2.5rem;
+    }
+
+    .separator {
+        font-size: 2rem;
+        transform: translateY(-0.5rem);
+    }
+
+    /* Map Route Planner Adjustment */
+    /* We make it flow normally instead of absolute positioning on mobile */
+    .glass-panel[style*="position: absolute"] {
+        position: relative !important;
+        top: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        margin-bottom: 1rem;
+        order: -1;
+        /* Ensure it's at the top */
+    }
+}
